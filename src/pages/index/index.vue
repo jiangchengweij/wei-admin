@@ -6,7 +6,6 @@
     <!--`<router-link>` 将呈现一个带有正确 `href` 属性的 `<a>` 标签-->
     <text @click="toNav">13123123</text>
   </p>
-  <text @click="toNav2">about</text>
   <!-- 路由出口 -->
   <!-- 路由匹配到的组件将渲染在这里 -->
   <router-view></router-view>
@@ -15,23 +14,17 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-const title = ref('Hello')
-const router = useRouter();
-const route = useRoute();
+import { useRouter } from '@/router'
 
-const Home = { template: '<div>Home</div>' }
-const About = { template: '<div>About</div>' }
-router.addRoute({ path: '/about', component: About })
-console.log('22222222222')
+const router = useRouter()
+
 function toNav() {
-  uni.navigateTo({
+  router.navigateTo({
     url: '/pages/test/test',
+    query: { a: 123123 }
   })
 }
-function toNav2() {
-  router.push('/about')
-}
+
 </script>
 
 <style>

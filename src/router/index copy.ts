@@ -1,4 +1,4 @@
-import type { RouteParams } from "@/types"
+
 import { cloneDeep, isArray, isFunction, isObject } from "lodash-es"
 
 const INTERCEPTOR_API: string[] = [
@@ -18,7 +18,7 @@ interface RouteOptions {
   homePage?: string
 }
 
-const getRealParams = function(params: RouteParams | string) {
+const getRealParams = function(params: any | string) {
   if (typeof params === 'string') return { url: params }
   if (!isObject(params)) throw new Error('The parameter of the route jump must be an object or a string')
 

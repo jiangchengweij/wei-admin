@@ -5,10 +5,10 @@
 </template>
 
 <script setup lang="ts">
-	import { useRouter } from 'vue-router'
+	import { useRouter } from '@/router'
 	const router = useRouter()
 	function back() {
-		router.back()
+		router.navigateBack()
 	}
 </script>
 

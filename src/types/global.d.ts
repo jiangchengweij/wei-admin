@@ -19,10 +19,16 @@ interface TableDefaultData<T = any> {
 }
 
 interface ApiResponse<T = any> {
-    code: number
+    code: number 
     data: T
     msg: string
     time: number
 }
 
 type ApiPromise<T = any> = Promise<ApiResponse<T>>
+
+type JSONObjKey = number | string | boolean
+
+type JSONObj = Record<string, JSONObjKey | JSONObjKey[]>
+
+

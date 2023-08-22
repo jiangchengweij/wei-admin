@@ -70,7 +70,7 @@ function getLangFileMessage(mList: any, locale: string) {
 }
 
 export function handleMessage(msg: anyObj) {
-
+  
 }
 
 export function mergeMsg(msg: anyObj, obj: anyObj) {
