@@ -1,0 +1,10 @@
+{
+  "name": "admin-router",
+  "dependencies": {
+    "uni-cloud-router": "file:../../../src/uni_modules/uni-cloud-router/uniCloud/cloudfunctions/common/uni-cloud-router",
+    "router-common": "file:../common/router-common"
+  },
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

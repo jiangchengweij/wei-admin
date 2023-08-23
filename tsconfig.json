@@ -4,8 +4,11 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "/@/*": ["./src/*"]
     },
+    "module": "esnext",
+    "moduleResolution": "node",
     "lib": ["esnext", "dom"],
     "types": ["@dcloudio/types"]
   },
