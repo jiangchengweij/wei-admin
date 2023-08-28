@@ -1,0 +1,44 @@
+{
+  "passwordSecret": "passwordSecret-demo",
+  "tokenSecret": "tokenSecret-demo",
+  "tokenExpiresIn": 7200,
+  "tokenExpiresThreshold": 3600,
+  "passwordErrorLimit": 6,
+  "bindTokenToDevice": false,
+  "passwordErrorRetryTime": 3600,
+  "autoSetInviteCode": false,
+  "forceInviteCode": false,
+	"web": {
+		"tokenExpiresIn": 7200,
+		"tokenExpiresThreshold": 3600,
+		"oauth": {
+			"weixin-h5": { 
+				"appid": "",
+				"appsecret": ""
+			},
+			"weixin-web": { 
+				"appid": "",
+				"appsecret": ""
+			}
+		}
+	},
+	"service": {
+		"sms": {
+			"name": "", 
+			"codeExpiresIn": 180,
+			"smsKey": "", 
+			"smsSecret": "",
+			"scene": {
+				"bind-mobile-by-sms": {
+					"templateId": "", 
+					"codeExpiresIn": 240 
+				}
+			}
+		},
+		"univerify": {
+			"appid": "",
+			"apiKey": "", 
+			"apiSecret": ""
+		}
+	}
+}

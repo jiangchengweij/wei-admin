@@ -28,6 +28,7 @@ function initRouter(app: App) {
               url: '/pages/login'
             })
             next()
+            return
           }
 
           // 按需动态加载页面的语言包-start
@@ -58,8 +59,6 @@ function initRouter(app: App) {
 
           // 去重
           loadPath = uniq(loadPath)
-
-          console.log(loadPath)
 
           for (const key in loadPath) {
             loadPath[key] = loadPath[key].replaceAll('${lang}', config.lang.defaultLang)

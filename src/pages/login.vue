@@ -1,7 +1,11 @@
 <template>
   <div>
     <div @contextmenu.stop="" id="bubble" class="bubble">
-      <canvas canvas-id="bubble-canvas" id="bubble-canvas" class="bubble-canvas"></canvas>
+      <canvas canvas-id="bubble-canvas" id="bubble-canvas" class="bubble-canvas"
+        :style="{
+          width: bubble.width.value +'px',
+          height: bubble.height.value + 'px'
+        }"></canvas>
     </div>
     <div class="login">
       <div class="login-box">
@@ -15,18 +19,28 @@
               <el-form-item prop="username">
                 <el-input ref="usernameRef" type="text" clearable v-model="form.username" :placeholder="t('login.Please enter an account')">
                   <template #prefix>
-                    <!-- <Icon name="fa fa-user" class="form-item-icon" size="16" color="var(--el-input-icon-color)" /> -->
+                    <m-icon name="fa fa-user" class="form-item-icon" size="16" color="var(--el-input-icon-color)" />
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item prop="password">
                 <el-input ref="passwordRef" v-model="form.password" type="password" :placeholder="t('login.Please input a password')" show-password>
                   <template #prefix>
-                    <!-- <Icon name="fa fa-unlock-alt" class="form-item-icon" size="16" color="var(--el-input-icon-color)" /> -->
+                    <m-icon name="fa fa-unlock-alt" class="form-item-icon" size="16" color="var(--el-input-icon-color)" />
                   </template>
                 </el-input>
               </el-form-item>
-              <el-checkbox v-model="form.keep" :label="t('login.Hold session')" size="default"></el-checkbox>
+              <el-form-item class="form-item-captcha" prop="captcha" v-if="state.showCaptcha">
+                <el-input v-model="form.captcha" type="text" :placeholder="t('login.Please input a captcha')"></el-input>
+                <div class="form-item-captcha__img-wrap" @click="setImageCaptcha">
+                  <el-image 
+                    class="form-item-captcha__img"
+                    fit="cover"
+                    :src="state.captchaBase64" 
+                    v-loading="state.captchaLoading">
+                  </el-image>
+                </div>
+              </el-form-item>
               <el-form-item>
                 <el-button :loading="state.submitLoading" class="submit-button" round type="primary" size="large" @click="onSubmitPre()">
                   {{ t('login.Sign in') }}
@@ -41,11 +55,17 @@
 </template>
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, reactive, ref, nextTick } from 'vue'
-import * as pageBubble from '/@/utils/pageBubble'
+import { usePagePubble, removeListeners as bubbleRemoveListeners } from '/@/utils/pageBubble'
 import type { FormInstance, InputInstance } from 'element-plus'
 import { uuid } from '/@/utils/random'
 import { buildValidatorData } from '/@/utils/validate'
 import { useI18n } from 'vue-i18n'
+import { ElNotification } from 'element-plus'
+
+const uniIDCo = uniCloud.importObject('uni-id-co', {
+  customUI: true
+})
+
 let timer: number
 
 const formRef = ref<FormInstance>()
@@ -55,6 +75,8 @@ const passwordRef = ref<InputInstance>()
 const state = reactive({
   showCaptcha: false,
   submitLoading: false,
+  captchaBase64: '',
+  captchaLoading: false
 })
 const form = reactive({
   username: '',
@@ -62,37 +84,85 @@ const form = reactive({
   keep: false,
   captchaId: uuid(),
   captchaInfo: '',
+  captcha: '',
 })
 
 const { t } = useI18n()
+
+const { bubble, init: bubbleInit } = usePagePubble()
 
 // 表单验证规则
 const rules = reactive({
   username: [buildValidatorData({ name: 'required', message: t('login.Please enter an account') }), buildValidatorData({ name: 'account' })],
   password: [buildValidatorData({ name: 'required', message: t('login.Please input a password') }), buildValidatorData({ name: 'password' })],
+  captcha: [buildValidatorData({ name: 'required', message: t('login.Please input a password') })],
 })
 
 onMounted(() => {
   timer = window.setTimeout(() => {
-    pageBubble.init()
+    bubbleInit()
   }, 1000)
 })
 
 onBeforeUnmount(() => {
   clearTimeout(timer)
-  pageBubble.removeListeners()
+  bubbleRemoveListeners()
 })
 
 const onSubmitPre = () => {
-    // formRef.value?.validate((valid) => {
-    //     if (valid) {
-    //         if (state.showCaptcha) {
-    //             clickCaptcha(form.captchaId, (captchaInfo: string) => onSubmit(captchaInfo))
-    //         } else {
-    //             onSubmit()
-    //         }
-    //     }
-    // })
+  formRef.value?.validate((valid) => {
+    if (valid) {
+      onSubmit()
+    }
+  })
+}
+
+function onSubmit() {
+  state.submitLoading = true
+  let data: anyObj = {
+    password: form.password,
+    captcha: form.captcha
+  }
+  if (/^1\d{10}$/.test(form.username)) {
+    data.mobile = form.username
+  } else if (/@/.test(form.username)) {
+    data.email = form.username
+  } else {
+    data.username = form.username
+  }
+  uniIDCo.login(data).then((res: { data: string }) => {
+    console.log(res)
+    state.submitLoading = false
+  }).catch((e: anyObj) => {
+    if(e.errCode === 'uni-id-captcha-required') {
+      state.showCaptcha = true
+      setImageCaptcha()
+    } else {
+      ElNotification({
+        message: e.errMsg,
+        type: 'error'
+      })
+      if(state.showCaptcha) setImageCaptcha()
+    }
+    state.submitLoading = false
+  })
+}
+
+const uniCaptchaCo = uniCloud.importObject('uni-captcha-co', {
+  customUI: true
+})
+
+function setImageCaptcha() {
+  state.captchaLoading = true
+  uniCaptchaCo.getImageCaptcha({
+    scene: 'login-by-pwd'
+  }).then((res: { captchaBase64: string }) => {
+    state.captchaBase64 = res.captchaBase64
+    state.captchaLoading = false
+  }).catch((e: unknown) => {
+    console.error(e)
+    state.captchaLoading = false
+  }) 
 }
 </script>
 <style scoped lang="scss">
@@ -156,6 +226,25 @@ const onSubmitPre = () => {
       font-weight: 300;
       margin-top: 15px;
       --el-button-bg-color: var(--el-color-primary);
+    }
+    .form-item-captcha {
+      &:deep(.el-form-item__content) {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+      }
+      &__img {
+        margin-left: 10px; 
+        height: 40px;
+        width: 120px;
+        &-wrap {
+          border-radius: 4px;
+          overflow: hidden;
+          display: inline-flex;
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+      }
     }
   }
 }

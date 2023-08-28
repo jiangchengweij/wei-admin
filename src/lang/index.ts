@@ -24,7 +24,7 @@ export let i18n: {
   global: Composer
 }
 
-export function loadLang(app: App) {
+export function loadLang(app: App, ElementPlus: any) {
   const config = useConfig()
   const locale = config.lang.defaultLang
 
@@ -66,6 +66,9 @@ export function loadLang(app: App) {
   })
 
   app.use(i18n as I18n)
+  app.use(ElementPlus, {
+    locale: messages[locale]
+  })
   return i18n
 }
 
