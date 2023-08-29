@@ -19,14 +19,14 @@
               <el-form-item prop="username">
                 <el-input ref="usernameRef" type="text" clearable v-model="form.username" :placeholder="t('login.Please enter an account')">
                   <template #prefix>
-                    <m-icon name="fa fa-user" class="form-item-icon" size="16" color="var(--el-input-icon-color)" />
+                    <wa-icon name="fa fa-user" class="form-item-icon" size="16" color="var(--el-input-icon-color)" />
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item prop="password">
                 <el-input ref="passwordRef" v-model="form.password" type="password" :placeholder="t('login.Please input a password')" show-password>
                   <template #prefix>
-                    <m-icon name="fa fa-unlock-alt" class="form-item-icon" size="16" color="var(--el-input-icon-color)" />
+                    <wa-icon name="fa fa-unlock-alt" class="form-item-icon" size="16" color="var(--el-input-icon-color)" />
                   </template>
                 </el-input>
               </el-form-item>
@@ -61,6 +61,9 @@ import { uuid } from '/@/utils/random'
 import { buildValidatorData } from '/@/utils/validate'
 import { useI18n } from 'vue-i18n'
 import { ElNotification } from 'element-plus'
+import { useCloud } from '@/cloud'
+
+const $cloud = useCloud()
 
 const uniIDCo = uniCloud.importObject('uni-id-co', {
   customUI: true
@@ -130,22 +133,27 @@ function onSubmit() {
   } else {
     data.username = form.username
   }
-  uniIDCo.login(data).then((res: { data: string }) => {
+  $cloud.uniIdCo.login(data).then((res: anyObj) => {
     console.log(res)
-    state.submitLoading = false
   }).catch((e: anyObj) => {
-    if(e.errCode === 'uni-id-captcha-required') {
-      state.showCaptcha = true
-      setImageCaptcha()
-    } else {
-      ElNotification({
-        message: e.errMsg,
-        type: 'error'
-      })
-      if(state.showCaptcha) setImageCaptcha()
-    }
-    state.submitLoading = false
+    console.error(e)
   })
+  // uniIDCo.login(data).then((res: { data: string }) => {
+  //   console.log(res)
+  //   state.submitLoading = false
+  // }).catch((e: anyObj) => {
+  //   if(e.errCode === 'uni-id-captcha-required') {
+  //     state.showCaptcha = true
+  //     setImageCaptcha()
+  //   } else {
+  //     ElNotification({
+  //       message: e.errMsg,
+  //       type: 'error'
+  //     })
+  //     if(state.showCaptcha) setImageCaptcha()
+  //   }
+  //   state.submitLoading = false
+  // })
 }
 
 const uniCaptchaCo = uniCloud.importObject('uni-captcha-co', {

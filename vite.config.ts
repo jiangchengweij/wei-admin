@@ -1,7 +1,7 @@
 import { defineConfig } from "vite"
 import uni from "@dcloudio/vite-plugin-uni"
 import { resolve } from 'path'
-import { svgBuilder } from './src/components/m-icon/svg/index'
+import { svgBuilder } from './src/components/wa-icon/svg/index'
 
 const pathResolve = (dir: string): any => {
   return resolve(__dirname, '.', dir)

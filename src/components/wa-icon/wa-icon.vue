@@ -2,10 +2,10 @@
 <script lang="ts">
 import { createVNode, resolveComponent, defineComponent, computed  } from 'vue'
 import type { CSSProperties } from 'vue'
-import svg from '/@/components/m-icon/svg/index.vue'
+import svg from '/@/components/wa-icon/svg/index.vue'
 import { isExternal } from '/@/utils/common'
 export default defineComponent({
-  name: 'Icon',
+  name: 'WaIcon',
   props: {
     name: {
       type: String,

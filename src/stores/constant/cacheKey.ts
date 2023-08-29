@@ -1,1 +1,2 @@
-export const BA_ACCOUNT =  'ba_account'
+// 管理员资料
+export const ADMIN_INFO = 'adminInfo'
