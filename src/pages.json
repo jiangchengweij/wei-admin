@@ -1,19 +1,39 @@
 {
 	"pages": [ 
 		{
-			"path": "pages/loading",
-			"style": {
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/login",
-			"style": {
-				"navigationStyle": "custom"
-			}
-		},
-		{
 			"path": "pages/index/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/login/login-withpwd",
+			"style": {
+				"navigationStyle": "custom",
+				"topWindow": false,
+				"leftWIndow": false
+			}
+		},
+		{
+			"path": "pages/error/404",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/demo/demo1",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/demo/demo2",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/demo/demo3",
 			"style": {
 				"navigationStyle": "custom"
 			}
@@ -24,5 +44,20 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
-	}
+	},
+  "topWindow": {
+    "path": "windows/topWindow",
+    "style": {
+      "height": "50px"
+    },
+    "matchMedia": {
+      "minWidth": 0
+    }
+  },
+  "leftWindow": {
+    "path": "windows/leftWindow",
+    "style": {
+      "width": "240px"
+    }
+  }
 }

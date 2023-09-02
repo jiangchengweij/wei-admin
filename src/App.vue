@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
+import { onLaunch, onShow, onHide, onPageNotFound } from "@dcloudio/uni-app";
+
 onLaunch(async () => {
 })
 </script>

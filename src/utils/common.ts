@@ -14,13 +14,13 @@ import { trim, trimStart } from 'lodash-es'
 import type { TranslateOptions } from 'vue-i18n'
 
 export function registerIcons(app: App) {
-    /*
-     * 全局注册element Plus的icon
-     */
-    const icons = elIcons as any
-    for (const i in icons) {
-        app.component(`el-icon-${icons[i].name}`, icons[i])
-    }
+  /*
+   * 全局注册element Plus的icon
+   */
+  const icons = elIcons as any
+  for (const i in icons) {
+    app.component(`el-icon-${icons[i].name}`, icons[i])
+  }
 }
 
 /**
@@ -28,11 +28,11 @@ export function registerIcons(app: App) {
  * @param url css资源url
  */
 export function loadCss(url: string): void {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = url
-    link.crossOrigin = 'anonymous'
-    document.getElementsByTagName('head')[0].appendChild(link)
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = url
+  link.crossOrigin = 'anonymous'
+  document.getElementsByTagName('head')[0].appendChild(link)
 }
 
 /**
@@ -40,9 +40,9 @@ export function loadCss(url: string): void {
  * @param url js资源url
  */
 export function loadJs(url: string): void {
-    const link = document.createElement('script')
-    link.src = url
-    document.body.appendChild(link)
+  const link = document.createElement('script')
+  link.src = url
+  document.body.appendChild(link)
 }
 
 /**
@@ -80,7 +80,7 @@ export function loadJs(url: string): void {
  * @param path
  */
 export function isExternal(path: string): boolean {
-    return /^(https?|ftp|mailto|tel):/.test(path)
+  return /^(https?|ftp|mailto|tel):/.test(path)
 }
 
 /**
@@ -89,14 +89,14 @@ export function isExternal(path: string): boolean {
  * @param ms 间隔毫秒数
  */
 export const debounce = (fn: Function, ms: number) => {
-    return (...args: any[]) => {
-        if (window.lazy) {
-            clearTimeout(window.lazy)
-        }
-        window.lazy = window.setTimeout(() => {
-            fn(...args)
-        }, ms)
+  return (...args: any[]) => {
+    if (window.lazy) {
+      clearTimeout(window.lazy)
     }
+    window.lazy = window.setTimeout(() => {
+      fn(...args)
+    }, ms)
+  }
 }
 
 /**
@@ -106,12 +106,12 @@ export const debounce = (fn: Function, ms: number) => {
  * @param value
  */
 export const getArrayKey = (arr: any, pk: string, value: any): any => {
-    for (const key in arr) {
-        if (arr[key][pk] == value) {
-            return key
-        }
+  for (const key in arr) {
+    if (arr[key][pk] == value) {
+      return key
     }
-    return false
+  }
+  return false
 }
 
 /**
@@ -128,18 +128,18 @@ export const getArrayKey = (arr: any, pk: string, value: any): any => {
  * @param data
  */
 export const buildJsonToElTreeData = (data: any): ElTreeData[] => {
-    if (typeof data == 'object') {
-        const childrens = []
-        for (const key in data) {
-            childrens.push({
-                label: key + ': ' + data[key],
-                children: buildJsonToElTreeData(data[key]),
-            })
-        }
-        return childrens
-    } else {
-        return []
+  if (typeof data == 'object') {
+    const childrens = []
+    for (const key in data) {
+      childrens.push({
+        label: key + ': ' + data[key],
+        children: buildJsonToElTreeData(data[key]),
+      })
     }
+    return childrens
+  } else {
+    return []
+  }
 }
 
 /**
@@ -160,9 +160,9 @@ export const buildJsonToElTreeData = (data: any): ElTreeData[] => {
  * 是否为手机设备
  */
 export const isMobile = () => {
-    return !!navigator.userAgent.match(
-        /android|webos|ip(hone|ad|od)|opera (mini|mobi|tablet)|iemobile|windows.+(phone|touch)|mobile|fennec|kindle (Fire)|Silk|maemo|blackberry|playbook|bb10\; (touch|kbd)|Symbian(OS)|Ubuntu Touch/i
-    )
+  return !!navigator.userAgent.match(
+    /android|webos|ip(hone|ad|od)|opera (mini|mobi|tablet)|iemobile|windows.+(phone|touch)|mobile|fennec|kindle (Fire)|Silk|maemo|blackberry|playbook|bb10\; (touch|kbd)|Symbian(OS)|Ubuntu Touch/i
+  )
 }
 
 /**
@@ -170,8 +170,8 @@ export const isMobile = () => {
  * @param path 文件路径
  */
 export const getFileNameFromPath = (path: string) => {
-    const paths = path.split('/')
-    return paths[paths.length - 1]
+  const paths = path.split('/')
+  return paths[paths.length - 1]
 }
 
 /**
@@ -284,70 +284,98 @@ export const getFileNameFromPath = (path: string) => {
  * @param fmt 格式化方式，默认：yyyy-mm-dd hh:MM:ss
  */
 export const timeFormat = (dateTime: string | number | null = null, fmt = 'yyyy-mm-dd hh:MM:ss') => {
-    if (dateTime == 'none') return i18n.global.t('None')
-    if (!dateTime) dateTime = Number(new Date())
-    if (dateTime.toString().length === 10) {
-        dateTime = +dateTime * 1000
-    }
+  if (dateTime == 'none') return i18n.global.t('None')
+  if (!dateTime) dateTime = Number(new Date())
+  if (dateTime.toString().length === 10) {
+    dateTime = +dateTime * 1000
+  }
 
-    const date = new Date(dateTime)
-    let ret
-    const opt: anyObj = {
-        'y+': date.getFullYear().toString(), // 年
-        'm+': (date.getMonth() + 1).toString(), // 月
-        'd+': date.getDate().toString(), // 日
-        'h+': date.getHours().toString(), // 时
-        'M+': date.getMinutes().toString(), // 分
-        's+': date.getSeconds().toString(), // 秒
+  const date = new Date(dateTime)
+  let ret
+  const opt: anyObj = {
+    'y+': date.getFullYear().toString(), // 年
+    'm+': (date.getMonth() + 1).toString(), // 月
+    'd+': date.getDate().toString(), // 日
+    'h+': date.getHours().toString(), // 时
+    'M+': date.getMinutes().toString(), // 分
+    's+': date.getSeconds().toString(), // 秒
+  }
+  for (const k in opt) {
+    ret = new RegExp('(' + k + ')').exec(fmt)
+    if (ret) {
+      fmt = fmt.replace(ret[1], ret[1].length == 1 ? opt[k] : padStart(opt[k], ret[1].length, '0'))
     }
-    for (const k in opt) {
-        ret = new RegExp('(' + k + ')').exec(fmt)
-        if (ret) {
-            fmt = fmt.replace(ret[1], ret[1].length == 1 ? opt[k] : padStart(opt[k], ret[1].length, '0'))
-        }
-    }
-    return fmt
+  }
+  return fmt
 }
 
 /**
  * 字符串补位
  */
 const padStart = (str: string, maxLength: number, fillString = ' ') => {
-    if (str.length >= maxLength) return str
+  if (str.length >= maxLength) return str
 
-    const fillLength = maxLength - str.length
-    let times = Math.ceil(fillLength / fillString.length)
-    while ((times >>= 1)) {
-        fillString += fillString
-        if (times === 1) {
-            fillString += fillString
-        }
+  const fillLength = maxLength - str.length
+  let times = Math.ceil(fillLength / fillString.length)
+  while ((times >>= 1)) {
+    fillString += fillString
+    if (times === 1) {
+      fillString += fillString
     }
-    return fillString.slice(0, fillLength) + str
+  } 
+  return fillString.slice(0, fillLength) + str
 }
 
 /**
  * 根据当前时间生成问候语
  */
 export const getGreet = () => {
-    const now = new Date()
-    const hour = now.getHours()
-    let greet = ''
+  const now = new Date()
+  const hour = now.getHours()
+  let greet = ''
 
-    if (hour < 5) {
-        greet = i18n.global.t('utils.Late at night, pay attention to your body!')
-    } else if (hour < 9) {
-        greet = i18n.global.t('utils.good morning!') + i18n.global.t('utils.welcome back')
-    } else if (hour < 12) {
-        greet = i18n.global.t('utils.Good morning!') + i18n.global.t('utils.welcome back')
-    } else if (hour < 14) {
-        greet = i18n.global.t('utils.Good noon!') + i18n.global.t('utils.welcome back')
-    } else if (hour < 18) {
-        greet = i18n.global.t('utils.good afternoon') + i18n.global.t('utils.welcome back')
-    } else if (hour < 24) {
-        greet = i18n.global.t('utils.Good evening') + i18n.global.t('utils.welcome back')
+  if (hour < 5) {
+    greet = i18n.global.t('utils.Late at night, pay attention to your body!')
+  } else if (hour < 9) {
+    greet = i18n.global.t('utils.good morning!') + i18n.global.t('utils.welcome back')
+  } else if (hour < 12) {
+    greet = i18n.global.t('utils.Good morning!') + i18n.global.t('utils.welcome back')
+  } else if (hour < 14) {
+    greet = i18n.global.t('utils.Good noon!') + i18n.global.t('utils.welcome back')
+  } else if (hour < 18) {
+    greet = i18n.global.t('utils.good afternoon') + i18n.global.t('utils.welcome back')
+  } else if (hour < 24) {
+    greet = i18n.global.t('utils.Good evening') + i18n.global.t('utils.welcome back')
+  } else {
+    greet = i18n.global.t('utils.Hello!') + i18n.global.t('utils.welcome back')
+  }
+  return greet
+}
+
+/**
+ * 数组转换为树结构
+ * @param list
+ * @param childrenKey
+ * @param parentKey
+ */
+export function listToTree<T>(
+    list: anyObj[], 
+    key: string = 'id', 
+    parentKey: string = 'parentId' ) {
+  let map: anyObj = {}, node, roots = [], i
+
+  for(i = 0; i < list.length; i += 1) {
+    map[list[i][key]] = i
+    list[i].children = []
+  }
+
+  for (i = 0; i < list.length; i += 1) {
+    node = list[i]
+    if (node[parentKey] && node[parentKey] !== '0') {
+      list[map[node[parentKey]]].children.push(node)
     } else {
-        greet = i18n.global.t('utils.Hello!') + i18n.global.t('utils.welcome back')
+      roots.push(node)
     }
-    return greet
+  }
+  return roots as T[]
 }

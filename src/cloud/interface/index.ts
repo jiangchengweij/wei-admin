@@ -1,4 +1,9 @@
 export interface Cloud {
-  collection?: UniCloud.CollectionReference,
+  uniIdCo: uniIdCo
   [key: string]: any,
 }
+
+export interface uniIdCo {
+  login: (data: anyObj) => Promise<anyObj>
+}
+

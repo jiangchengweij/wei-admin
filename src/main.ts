@@ -12,8 +12,8 @@ import '/@/styles/index.scss'
 
 export function createApp() {
   const app = createSSRApp(App)
-  initRouter(app)
   app.use(pinia)
+  initRouter(app)
   loadLang(app, ElementPlus)
   registerIcons(app)
   return {

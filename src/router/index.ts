@@ -6,49 +6,74 @@ import langAutoLoadMap from '/@/lang/autoload'
 import { useConfig } from '/@/stores/config'
 import { uniq } from 'lodash-es'
 import { mergeMessage } from '/@/lang/index'
+import { useAdminInfo } from '@/stores/adminInfo'
+import { useNavTabs } from '@/stores/navTabs'
+import adminConfig from '@/admin.config'
 
-export const loginPath = '/pages/login'
-
-export const homePath = '/pages/index/index'
-
-export const loadingPath = '/pages/loading'
+const loginPath = adminConfig?.login?.url
+const notFountPath = adminConfig?.error?.url
+const homePath = adminConfig?.index.url
 
 function initRouter(app: App) {
   app.config.globalProperties = new Proxy(app.config.globalProperties, {
     set: function (target, propKey, value, receiver) {
       if (propKey === '$router') {
-        (value as Router).beforeEach((to, from, next) => {
+        (value as Router).beforeEach(async (to, from, next) => {
           if (!window.existLoading) {
             loading.show()
             window.existLoading = true
           }
+          //如果没有配置登录页面无需鉴权拦截
+          if(loginPath) {
+            const adminInfo = useAdminInfo()
+            let hasLogin = false
+            if(!!adminInfo.getToken()) {
+              hasLogin = true
+            }
+            if(to.path === loginPath && hasLogin) { //进入登录界面判断是否登录，如果已经登录，则阻止进入登录页面
+              next({ path: homePath })
+              return
+            }
+            if(to.path !== loginPath && !hasLogin) {
+              next({ path: loginPath })
+              return
+            }
+            if(to.path !== loginPath) {
+              //是否需要获取初始化信息
+              if(!adminInfo.hasInitAdminInfo) {
+                try {
+                  await adminInfo.initAdminInfo()
+                } catch(e) { //获取信息失败,重新登录
+                  next({ path: loginPath })
+                  return
+                }
+              }
+              const navTabs = useNavTabs()
+              navTabs.setActiveMenu(to)
+            }
+          }
 
-          if(to.fullPath !== loginPath) {
-            uni.redirectTo({
-              url: '/pages/login'
-            })
-            next()
-            return
+          const config = useConfig()
+
+          if(to.path === loginPath) {
+            config.layout.showNavTab = false
+          } else {
+            config.layout.showNavTab = true
           }
 
           // 按需动态加载页面的语言包-start
           let loadPath: string[] = []
-          const config = useConfig()
-          if (to.path in langAutoLoadMap) {
-            loadPath.push(...langAutoLoadMap[to.path as keyof typeof langAutoLoadMap])
-          }
+          
+          // if (to.path in langAutoLoadMap) {
+          //   loadPath.push(...langAutoLoadMap[to.path as keyof typeof langAutoLoadMap])
+          // }
           let prefix = ''
 
           prefix = './backend/' + config.lang.defaultLang
-
+          
           // 去除 path 中的 /pages
           const adminPath = to.path.slice(to.path.indexOf('/pages') + '/pages'.length)
           if (adminPath) loadPath.push(prefix + adminPath + '.ts')
-
-          // 根据路由 name 加载的语言包
-          if (to.name) {
-            loadPath.push(prefix + '/' + to.name.toString() + '.ts')
-          }
 
           if (!window.loadLangHandle.publicMessageLoaded) window.loadLangHandle.publicMessageLoaded = []
           const publicMessagePath = prefix + '.ts'
@@ -56,7 +81,6 @@ function initRouter(app: App) {
             loadPath.push(publicMessagePath)
             window.loadLangHandle.publicMessageLoaded.push(publicMessagePath)
           }
-
           // 去重
           loadPath = uniq(loadPath)
 

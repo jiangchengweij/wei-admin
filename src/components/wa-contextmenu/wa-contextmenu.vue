@@ -11,7 +11,7 @@
       <ul class="el-dropdown-menu">
         <template v-for="(item, idx) in props.items" :key="idx">
           <li class="el-dropdown-menu__item" :class="item.disabled ? 'is-disabled' : ''" tabindex="-1" @click="onContextmenuItem(item)">
-            <Icon size="12" :name="item.icon" />
+            <wa-icon size="12" :name="item.icon" />
             <span>{{ item.label }}</span>
           </li>
         </template>
@@ -23,15 +23,21 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, toRaw } from 'vue'
-import type { Axis, ContextmenuItemClickEmitArg, Props } from './interface'
-import type { RouteLocationNormalized } from 'vue-router'
+import type { PropType } from 'vue'
+import type { Axis, ContextmenuItemClickEmitArg, ContextMenuItem } from './interface'
 import { useEventListener } from '@vueuse/core'
+import type { AdminMenu } from '@/stores/interface'
 
-const props = withDefaults(defineProps<Props>(), {
-  width: 150,
-  items: () => [],
+const props = defineProps({
+  width: {
+    type: Number,
+    default: 150,
+  },
+  items: {
+    type: Array as PropType<ContextMenuItem[]>,
+    default: () => []
+  },
 })
-
 const emits = defineEmits<{
   (e: 'contextmenuItemClick', item: ContextmenuItemClickEmitArg): void
 }>()
@@ -42,7 +48,7 @@ const state: {
     x: number
     y: number
   }
-  menu: RouteLocationNormalized | undefined
+  menu: AdminMenu | undefined
   arrowAxis: number
 } = reactive({
   show: false,
@@ -54,7 +60,7 @@ const state: {
   arrowAxis: 10,
 })
 
-const onShowContextmenu = (menu: RouteLocationNormalized, axis: Axis) => {
+const onShowContextmenu = (menu: AdminMenu, axis: Axis) => {
   state.menu = menu
   state.axis = axis
   state.show = true
@@ -82,6 +88,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .ba-contextmenu {
+  position: fixed;
   z-index: 9999;
 }
 .el-popper,

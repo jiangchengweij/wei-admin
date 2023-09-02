@@ -1,22 +1,35 @@
 import type { Cloud } from './interface'
+import { ElNotification } from 'element-plus'
 
 const db = uniCloud.databaseForJQL()
 
 async function CallFun(this:{ fun: Function }, data: unknown) {
+  let error = null
   try {
     const res = await this.fun(data)
-    return res
+    let resData = res.result ? res.result : res
+    if (!resData.errCode || resData.errCode === 0) {
+      return resData
+    }
+    error = res
   } catch(e) {
-    errroHandle(e as UniCloud.UniError)
+    error = e
   }
+  errroHandle(error as UniCloud.UniError)
+  throw error
 }
 export function useCloud() {
-  const cacheCoInsMap = {}
+  const cacheCoInsMap: any = {}
   const cloudProxy = new Proxy<Cloud>(cacheCoInsMap, {
     get(target, propKey: string, _receiver) {
       const key = kebabCase(propKey as string)
-      if(key.endsWith('-db')) {
-        return db
+      if(key.endsWith('-cf')) {
+        const genGun = (name: string) => {
+          return async function(data: anyObj) {
+            return await uniCloud.callFunction({ name, data })
+          }
+        }
+        return CallFun.bind({ fun: genGun(key) })
       } else if(key.endsWith('-co')) {
         if(!target[propKey]) {
           const uniCoIns = uniCloud.importObject(key, {
@@ -30,9 +43,7 @@ export function useCloud() {
         }
         return target[propKey]
       } else {
-        const fun = (data) => {
-          
-        }
+        return db
       }
     }
   })
@@ -47,5 +58,8 @@ function kebabCase(word: string) {
 }
 
 function errroHandle(e: UniCloud.UniError) {
-  
+  ElNotification({
+    message: e.errMsg || '未知错误',
+    type: 'error'
+  })
 }

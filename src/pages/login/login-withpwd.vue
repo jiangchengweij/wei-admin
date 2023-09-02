@@ -17,21 +17,21 @@
           <div class="content">
             <el-form @keyup.enter="onSubmitPre()" ref="formRef" :rules="rules" size="large" :model="form">
               <el-form-item prop="username">
-                <el-input ref="usernameRef" type="text" clearable v-model="form.username" :placeholder="t('login.Please enter an account')">
+                <el-input ref="usernameRef" type="text" clearable v-model="form.username" :placeholder="t('login.login-withpwd.Please enter an account')">
                   <template #prefix>
                     <wa-icon name="fa fa-user" class="form-item-icon" size="16" color="var(--el-input-icon-color)" />
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item prop="password">
-                <el-input ref="passwordRef" v-model="form.password" type="password" :placeholder="t('login.Please input a password')" show-password>
+                <el-input ref="passwordRef" v-model="form.password" type="password" :placeholder="t('login.login-withpwd.Please input a password')" show-password>
                   <template #prefix>
                     <wa-icon name="fa fa-unlock-alt" class="form-item-icon" size="16" color="var(--el-input-icon-color)" />
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item class="form-item-captcha" prop="captcha" v-if="state.showCaptcha">
-                <el-input v-model="form.captcha" type="text" :placeholder="t('login.Please input a captcha')"></el-input>
+                <el-input v-model="form.captcha" type="text" :placeholder="t('login.login-withpwd.Please input a captcha')"></el-input>
                 <div class="form-item-captcha__img-wrap" @click="setImageCaptcha">
                   <el-image 
                     class="form-item-captcha__img"
@@ -43,7 +43,7 @@
               </el-form-item>
               <el-form-item>
                 <el-button :loading="state.submitLoading" class="submit-button" round type="primary" size="large" @click="onSubmitPre()">
-                  {{ t('login.Sign in') }}
+                  {{ t('login.login-withpwd.Sign in') }}
                 </el-button>
               </el-form-item>
             </el-form>
@@ -54,7 +54,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, reactive, ref, nextTick } from 'vue'
+import { onMounted, onBeforeUnmount, reactive, ref, nextTick, onBeforeMount } from 'vue'
 import { usePagePubble, removeListeners as bubbleRemoveListeners } from '/@/utils/pageBubble'
 import type { FormInstance, InputInstance } from 'element-plus'
 import { uuid } from '/@/utils/random'
@@ -64,10 +64,6 @@ import { ElNotification } from 'element-plus'
 import { useCloud } from '@/cloud'
 
 const $cloud = useCloud()
-
-const uniIDCo = uniCloud.importObject('uni-id-co', {
-  customUI: true
-})
 
 let timer: number
 
@@ -90,15 +86,16 @@ const form = reactive({
   captcha: '',
 })
 
+
 const { t } = useI18n()
 
 const { bubble, init: bubbleInit } = usePagePubble()
 
 // 表单验证规则
 const rules = reactive({
-  username: [buildValidatorData({ name: 'required', message: t('login.Please enter an account') }), buildValidatorData({ name: 'account' })],
-  password: [buildValidatorData({ name: 'required', message: t('login.Please input a password') }), buildValidatorData({ name: 'password' })],
-  captcha: [buildValidatorData({ name: 'required', message: t('login.Please input a password') })],
+  username: [buildValidatorData({ name: 'required', message: t('login.login-withpwd.Please enter an account') }), buildValidatorData({ name: 'account' })],
+  password: [buildValidatorData({ name: 'required', message: t('login.login-withpwd.Please input a password') }), buildValidatorData({ name: 'password' })],
+  captcha: [buildValidatorData({ name: 'required', message: t('login.login-withpwd.Please input a password') })],
 })
 
 onMounted(() => {
@@ -133,27 +130,24 @@ function onSubmit() {
   } else {
     data.username = form.username
   }
-  $cloud.uniIdCo.login(data).then((res: anyObj) => {
-    console.log(res)
-  }).catch((e: anyObj) => {
-    console.error(e)
+  $cloud.uniIdCo.login(data).then((res) => {
+    state.submitLoading = false
+    ElNotification({
+      message: '登录成功',
+      type: 'success',
+    })
+    uni.redirectTo({
+      url: '/pages/index/index'
+    })
+  }).catch((e: UniCloud.UniError) => {
+    if(e.errCode === 'uni-id-captcha-required') {
+      state.showCaptcha = true
+      setImageCaptcha()
+    } else {
+      if(state.showCaptcha) setImageCaptcha()
+    }
+    state.submitLoading = false
   })
-  // uniIDCo.login(data).then((res: { data: string }) => {
-  //   console.log(res)
-  //   state.submitLoading = false
-  // }).catch((e: anyObj) => {
-  //   if(e.errCode === 'uni-id-captcha-required') {
-  //     state.showCaptcha = true
-  //     setImageCaptcha()
-  //   } else {
-  //     ElNotification({
-  //       message: e.errMsg,
-  //       type: 'error'
-  //     })
-  //     if(state.showCaptcha) setImageCaptcha()
-  //   }
-  //   state.submitLoading = false
-  // })
 }
 
 const uniCaptchaCo = uniCloud.importObject('uni-captcha-co', {
@@ -188,7 +182,7 @@ function setImageCaptcha() {
   height: auto;
 }
 .login {
-  position: absolute;
+  position: fixed;
   top: 0;
   display: flex;
   width: 100vw;

@@ -215,3 +215,9 @@ body,
   }
 }
 /* 自适应-e */
+
+/* 修改uni-app默认布局 */
+uni-page {
+  padding-top: var(--nav-tab-height, 0);
+  box-sizing: border-box;
+}

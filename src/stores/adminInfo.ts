@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { ADMIN_INFO } from '/@/stores/constant/cacheKey'
 import type { AdminInfo } from '/@/stores/interface'
+import { useCloud } from '@/cloud'
+import { useNavTabs } from './navTabs'
 
 export const useAdminInfo = defineStore('adminInfo', {
   state: (): AdminInfo => {
@@ -8,11 +9,10 @@ export const useAdminInfo = defineStore('adminInfo', {
       id: 0,
       username: '',
       nickname: '',
-      avatar: '',
-      last_login_time: '',
-      token: '',
-      refresh_token: '',
-      // 是否是superAdmin，用于判定是否显示终端按钮等，不做任何权限判断
+      last_login_date: '',
+      token: null,
+      hasInitAdminInfo: false,
+      role: [],
       super: false,
     }
   },
@@ -20,22 +20,33 @@ export const useAdminInfo = defineStore('adminInfo', {
     dataFill(state: AdminInfo) {
       this.$state = { ...this.$state, ...state }
     },
+    setToken(token: string) {
+      this.token = token
+    },
     removeToken() {
-      this.token = ''
-      this.refresh_token = ''
+      this.token = null
     },
-    setToken(token: string, type: 'auth' | 'refresh') {
-      const field = type == 'auth' ? 'token' : 'refresh_token'
-      this[field] = token
+    getToken() {
+      if(this.token) {
+        return this.token
+      }
+      const tokenExpired = uni.getStorageSync('uni_id_token_expired')
+      const now = Date.now()
+      if(now > tokenExpired) {
+        return null
+      }
+      return uni.getStorageSync("uni_id_token")
     },
-    getToken(type: 'auth' | 'refresh' = 'auth') {
-      return type === 'auth' ? this.token : this.refresh_token
-    },
-    setSuper(val: boolean) {
-      this.super = val
-    },
-  },
-  persist: {
-    key: ADMIN_INFO,
+    async initAdminInfo() {
+      const navTabs = useNavTabs()
+      const $cloud = useCloud()
+      const { menus, adminInfo } = await $cloud.adminInitCf()
+      navTabs.setTabsViewRoutes(menus)
+      this.dataFill(adminInfo)
+      if(this.role.includes('admin')) {
+        this.super = true
+      }
+      this.hasInitAdminInfo = true
+    }
   },
 })

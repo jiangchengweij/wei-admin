@@ -32,12 +32,10 @@ export function loadLang(app: App, ElementPlus: any) {
   if (locale == 'zh-cn') {
     window.loadLangHandle = {
       ...import.meta.glob('./backend/zh-cn/**/*.ts'),
-      ...import.meta.glob('./backend/zh-cn.ts'),
     }
   } else {
     window.loadLangHandle = {
       ...import.meta.glob('./backend/en/**/*.ts'),
-      ...import.meta.glob('./backend/en.ts'),
     }
   }
 
