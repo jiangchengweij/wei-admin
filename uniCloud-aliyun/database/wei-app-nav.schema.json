@@ -1,0 +1,56 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": ["image", "title", "open_url"],
+	"permission": {
+		"read": true,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+    "image": {
+    	"bsonType": "string",
+    	"title": "图片文件",
+    	"description": "图片的url"
+    },
+    "title": {
+    	"bsonType": "string",
+    	"description": "导航名称"
+    },
+    "category_id": {
+      "bsonType": "string",
+      "description": "商品分类，可以不填"
+    },
+    "open_url": {
+    	"bsonType": "string",
+    	"description": "点击跳转目标地址。",
+    	"title": "点击目标地址",
+    	"trim": "both"
+    },
+    "open_type": {
+      "bsonType": "int",
+      "description": "跳转类型, 1: 网页, 2: 页面"
+    },
+    "sort": {
+    	"bsonType": "int",
+    	"description": "数字越小，排序越前",
+    	"title": "排序"
+    },
+    "status": {
+    	"bsonType": "int",
+    	"defaultValue": 1,
+      "description": "生效状态, 1:生效,2:失效",
+    	"title": "生效状态"
+    },
+    "description": {
+    	"bsonType": "string",
+    	"description": "维护者自用描述",
+    	"title": "备注",
+    	"trim": "both"
+    }
+	}
+}

@@ -1,0 +1,41 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": ["name", "freight_rules"],
+	"permission": {
+		"read": false,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+    "name": {
+      "bsonType": "string",
+      "description": "运费模板名称"
+    },
+    "freight_rules": {
+      "bsonType": "array",
+      "description": "运费规则"
+    },
+    "max_weight": {
+      "bsonType": "int",
+      "description": "拆包重量"
+    },
+    "description": {
+    	"bsonType": "string",
+    	"description": "维护者自用描述",
+    	"title": "备注",
+    	"trim": "both"
+    },
+    "create_date": {
+      "bsonType": "timestamp",
+      "description": "创建时间",
+      "defaultValue": {
+      	"$env": "now"
+      }
+    }
+	}
+}

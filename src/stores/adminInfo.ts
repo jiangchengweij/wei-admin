@@ -24,6 +24,8 @@ export const useAdminInfo = defineStore('adminInfo', {
       this.token = token
     },
     removeToken() {
+      uni.removeStorageSync('uni_id_token')
+      uni.removeStorageSync('uni_id_token_expired')
       this.token = null
     },
     getToken() {
@@ -40,13 +42,17 @@ export const useAdminInfo = defineStore('adminInfo', {
     async initAdminInfo() {
       const navTabs = useNavTabs()
       const $cloud = useCloud()
-      const { menus, adminInfo } = await $cloud.adminInitCf()
-      navTabs.setTabsViewRoutes(menus)
-      this.dataFill(adminInfo)
-      if(this.role.includes('admin')) {
-        this.super = true
+      try {
+        const { menus, adminInfo } = await $cloud.adminRouter('main/init')
+        navTabs.setTabsViewRoutes(menus)
+        this.dataFill(adminInfo)
+        if(this.role.includes('admin')) {
+          this.super = true
+        }
+        this.hasInitAdminInfo = true
+      } catch(e) {
+        this.removeToken()
       }
-      this.hasInitAdminInfo = true
     }
   },
 })

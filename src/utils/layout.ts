@@ -1,3 +1,22 @@
+import { useConfig } from "@/stores/config"
+import type { CSSProperties } from "vue"
+
+/**
+ * main高度
+ * @param extra main高度额外减去的px数,可以实现隐藏原有的滚动条
+ * @returns CSSProperties
+ */
+export function mainHeight(extra = 0): CSSProperties {
+  let height = extra
+  const config = useConfig()
+  height += config.layout.headerHeight
+  if(config.layout.showNavTab && config.layout.navTab) {
+    height += config.layout.navTabHeight
+  }
+  return {
+    height: 'calc(100vh - ' + height.toString() + 'px)',
+  }
+}
 
 /**
  * 设置导航栏宽度

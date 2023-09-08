@@ -37,6 +37,24 @@
 			"style": {
 				"navigationStyle": "custom"
 			}
+		},
+		{
+			"path": "pages/system/menu/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/system/permission/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/system/user/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
 		}
   ],
 	"globalStyle": {

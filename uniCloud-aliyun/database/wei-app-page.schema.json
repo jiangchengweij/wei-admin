@@ -1,0 +1,41 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": ["path", "title"],
+	"permission": {
+		"read": false,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+    "path": {
+    	"bsonType": "string",
+    	"description": "页面路径",
+    	"trim": "both"
+    },
+    "title": {
+      "bsonType": "string",
+      "description": "页面名称"
+    },
+    "type": {
+      "bsonType": "int",
+      "description": "页面类型，保留字段, 1: 小程序",
+      "defaultValue": 1
+    },
+    "status": {
+    	"bsonType": "int",
+    	"defaultValue": 1,
+      "description": "生效状态, 1:生效, 2:失效"
+    },
+    "description": {
+    	"bsonType": "string",
+    	"description": "维护者自用描述",
+    	"title": "备注",
+    	"trim": "both"
+    }
+	}
+}

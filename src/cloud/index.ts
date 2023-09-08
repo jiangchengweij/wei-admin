@@ -1,7 +1,7 @@
 import type { Cloud } from './interface'
 import { ElNotification } from 'element-plus'
 
-const db = uniCloud.databaseForJQL()
+export const db = uniCloud.databaseForJQL()
 
 async function CallFun(this:{ fun: Function }, data: unknown) {
   let error = null
@@ -18,6 +18,11 @@ async function CallFun(this:{ fun: Function }, data: unknown) {
   errroHandle(error as UniCloud.UniError)
   throw error
 }
+
+function CallRouterFn(this:{ fun: Function }, action: string, data: unknown) {
+  return CallFun.call(this, { action, data })
+}
+
 export function useCloud() {
   const cacheCoInsMap: any = {}
   const cloudProxy = new Proxy<Cloud>(cacheCoInsMap, {
@@ -42,6 +47,13 @@ export function useCloud() {
           })
         }
         return target[propKey]
+      } else if(key.endsWith('-router')) {
+        const routerFn = (name: string) => {
+          return async function (data: anyObj) {
+            return await uniCloud.callFunction({ name, data })
+          }
+        }
+        return CallRouterFn.bind({ fun: routerFn(key) })
       } else {
         return db
       }

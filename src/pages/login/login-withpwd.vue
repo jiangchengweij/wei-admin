@@ -62,6 +62,9 @@ import { buildValidatorData } from '/@/utils/validate'
 import { useI18n } from 'vue-i18n'
 import { ElNotification } from 'element-plus'
 import { useCloud } from '@/cloud'
+import { onLoad } from '@dcloudio/uni-app'
+import { routePush } from '@/utils/router'
+import adminConfig from '@/admin.config'
 
 const $cloud = useCloud()
 
@@ -96,6 +99,14 @@ const rules = reactive({
   username: [buildValidatorData({ name: 'required', message: t('login.login-withpwd.Please enter an account') }), buildValidatorData({ name: 'account' })],
   password: [buildValidatorData({ name: 'required', message: t('login.login-withpwd.Please input a password') }), buildValidatorData({ name: 'password' })],
   captcha: [buildValidatorData({ name: 'required', message: t('login.login-withpwd.Please input a password') })],
+})
+
+const reactiveTo = ref<string>()
+
+onLoad((params) => {
+  if(params?.redirect) {
+    reactiveTo.value = params.redirect
+  }
 })
 
 onMounted(() => {
@@ -136,9 +147,11 @@ function onSubmit() {
       message: '登录成功',
       type: 'success',
     })
-    uni.redirectTo({
-      url: '/pages/index/index'
-    })
+    if(reactiveTo.value) {
+      routePush(reactiveTo.value)
+    } else {
+      routePush(adminConfig.index?.url || '/')
+    }
   }).catch((e: UniCloud.UniError) => {
     if(e.errCode === 'uni-id-captcha-required') {
       state.showCaptcha = true

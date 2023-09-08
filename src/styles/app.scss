@@ -45,7 +45,7 @@ body,
 }
 
 .default-main {
-  margin: var(--ba-main-space) var(--ba-main-space) 60px var(--ba-main-space);
+  margin: 0 var(--ba-main-space) 60px var(--ba-main-space);
 }
 .zoom-handle {
   position: absolute;
@@ -94,10 +94,10 @@ body,
 /* 鼠标置入浮动效果-e */
 
 /* 表格-s */
-.ba-table-box {
+.wa-table-box {
   border-radius: var(--el-border-radius-round);
 }
-.ba-table-alert {
+.wa-table-alert {
   background-color: var(--el-fill-color-darker) !important;
   border: 1px solid var(--ba-boder-color);
   border-bottom: 0;
@@ -107,34 +107,34 @@ body,
 /* 表格-e */
 
 /* 新增/编辑表单-s */
-.ba-operate-dialog {
+.wa-operate-dialog {
   min-width: 400px;
   overflow: hidden;
   border-radius: var(--el-border-radius-base);
 }
-.ba-operate-dialog .el-dialog__header {
+.wa-operate-dialog .el-dialog__header {
   padding-bottom: 16px;
   border-bottom: 1px solid var(--ba-bg-color);
 }
-.ba-operate-dialog .el-dialog__body {
+.wa-operate-dialog .el-dialog__body {
   height: 60vh;
   padding-top: 0;
   padding-bottom: 52px;
 }
-.ba-operate-dialog .el-dialog__footer {
+.wa-operate-dialog .el-dialog__footer {
   padding: 10px var(--el-dialog-padding-primary);
   box-shadow: var(--el-box-shadow);
   position: absolute;
   width: 100%;
   bottom: 0;
 }
-.ba-operate-form {
+.wa-operate-form {
   padding-top: 30px;
 }
 /* 新增/编辑表单-e */
 
 /* 全局遮罩-s */
-.ba-layout-shade {
+.wa-layout-shade {
   position: fixed;
   top: 0;
   left: 0;
@@ -221,3 +221,4 @@ uni-page {
   padding-top: var(--nav-tab-height, 0);
   box-sizing: border-box;
 }
+

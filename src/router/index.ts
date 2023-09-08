@@ -3,12 +3,15 @@ import { isArray, isObject } from 'lodash-es'
 import type { App } from 'vue'
 import { loading } from '@/utils/loading'
 import langAutoLoadMap from '/@/lang/autoload'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 import { useConfig } from '/@/stores/config'
 import { uniq } from 'lodash-es'
 import { mergeMessage } from '/@/lang/index'
 import { useAdminInfo } from '@/stores/adminInfo'
 import { useNavTabs } from '@/stores/navTabs'
 import adminConfig from '@/admin.config'
+import { addParams, routePush } from '@/utils/router'
 
 const loginPath = adminConfig?.login?.url
 const notFountPath = adminConfig?.error?.url
@@ -19,6 +22,8 @@ function initRouter(app: App) {
     set: function (target, propKey, value, receiver) {
       if (propKey === '$router') {
         (value as Router).beforeEach(async (to, from, next) => {
+          NProgress.configure({ showSpinner: false })
+          NProgress.start()
           if (!window.existLoading) {
             loading.show()
             window.existLoading = true
@@ -31,12 +36,20 @@ function initRouter(app: App) {
               hasLogin = true
             }
             if(to.path === loginPath && hasLogin) { //进入登录界面判断是否登录，如果已经登录，则阻止进入登录页面
-              next({ path: homePath })
+              next({ path: homePath || '/' })
               return
             }
+            const redirectLogin = () => {
+              let url = loginPath
+              if(to.path && to.path !== '/') {
+                url = addParams(url, { ...to.params, redirect: to.path })
+              }
+              routePush(url)
+            }
             if(to.path !== loginPath && !hasLogin) {
-              next({ path: loginPath })
-              return
+              redirectLogin()
+              next()
+              return;
             }
             if(to.path !== loginPath) {
               //是否需要获取初始化信息
@@ -44,8 +57,9 @@ function initRouter(app: App) {
                 try {
                   await adminInfo.initAdminInfo()
                 } catch(e) { //获取信息失败,重新登录
-                  next({ path: loginPath })
-                  return
+                  redirectLogin()
+                  next()
+                  return;
                 }
               }
               const navTabs = useNavTabs()
@@ -100,6 +114,7 @@ function initRouter(app: App) {
           if (window.existLoading) {
             loading.hide()
           }
+          NProgress.done()
         })
       }
       return Reflect.set(target, propKey, value, receiver)

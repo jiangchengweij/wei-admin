@@ -1,0 +1,64 @@
+// 文档教程: https://uniapp.dcloud.net.cn/uniCloud/schema
+{
+	"bsonType": "object",
+	"required": [],
+  "description": "素材库",
+	"permission": {
+		"read": false,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+    "uid": {
+      "bsonType": "string",
+      "description": "上传者的用户ID",
+      "forceDefaultValue": {
+        "$env": "uid"
+      }
+    },
+    "fileID": {
+      "bsonType": "string",
+      "description": "云存储的ID, 也是文件的地址"
+    },
+    "type": {
+      "bsonType": "string",
+      "description": "文件类型, 支持：image、video、audio"
+    },
+    "file_type": {
+      "bsonType": "string",
+      "description": "文件类型全称, 支持：image/*、video/*、audio/*"
+    },
+    "name": {
+      "bsonType": "string",
+      "description": "文件名称"
+    },
+    "size": {
+      "bsonType": "int",
+      "description": "文件占用空间大小"
+    },
+    "cover": {
+      "bsonType": "string",
+      "description": "视频文件和其他文件存在缩略图"
+    },
+    "group_id": {
+      "bsonType": "string",
+      "description": "分组的唯一ID",
+      "foreignKey": "wei-files-group._id"
+    },
+    "remarks": {
+      "bsonType": "string",
+      "description": "文件备注，由系统生成"
+    },
+    "create_date": {
+    	"bsonType": "timestamp",
+    	"description": "文件的上传时间",
+      "forceDefaultValue": {
+      	"$env": "now"
+      }
+    }
+	}
+}

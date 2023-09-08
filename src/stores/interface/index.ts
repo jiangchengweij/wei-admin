@@ -5,8 +5,8 @@ export interface AdminInfo {
   username: string
   nickname: string
   last_login_date: string
-  token: string | null,
-  hasInitAdminInfo: boolean,
+  token: string | null
+  hasInitAdminInfo: boolean
   role: string[]
   super: boolean
 }
@@ -34,7 +34,7 @@ export interface Layout {
   headerBarTabActiveColor: string[]
   headerHeight: number
   navTabHeight: number
-  showNavTab: boolean,
+  showNavTab: boolean
   navTab: boolean
 }
 
@@ -58,4 +58,34 @@ export interface NavTabs {
   tabsViewsPathMap: Record<string, string>
   tabsViewMenuIdMap: Record<string, AdminMenu>
   authNode: Map<string, string[]>
+}
+
+export interface Menus {
+  id: number
+  name: string
+  type: string
+  path: string
+  title: string
+  url: string
+  meta: {
+    type: 'tab' | 'link' | 'iframe'
+  }
+  children: Menus[]
+}
+
+export interface SiteConfig {
+  siteName: string
+  recordNumber?: string
+  version: string
+  cdnUrl: string
+  apiUrl: string
+  upload: {
+    mode: string
+    maxsize: number
+    mimetype: string
+    savename: string
+    url?: string
+    params?: anyObj
+  }
+  headNav: Menus[]
 }

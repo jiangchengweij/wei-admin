@@ -5,6 +5,7 @@ import ElementPlus from 'element-plus'
 import pinia from "./stores"
 import { registerIcons } from '/@/utils/common'
 import { loadLang } from '/@/lang/index'
+import { directives } from '/@/utils/directives'
 import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/display.css'
 import 'font-awesome/css/font-awesome.min.css'
@@ -15,6 +16,8 @@ export function createApp() {
   app.use(pinia)
   initRouter(app)
   loadLang(app, ElementPlus)
+  // 全局注册
+  directives(app) // 指令
   registerIcons(app)
   return {
     app,

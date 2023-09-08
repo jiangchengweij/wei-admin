@@ -5,7 +5,7 @@ import router from '/@/router/index'
 //import { useNavTabs } from '/@/stores/navTabs'
 //import { useMemberCenter } from '/@/stores/memberCenter'
 //import { FormInstance } from 'element-plus'
-//import { useSiteConfig } from '../stores/siteConfig'
+import { useSiteConfig } from '../stores/siteConfig'
 import { useTitle } from '@vueuse/core'
 import { i18n } from '../lang'
 //import { getUrl } from './axios'
@@ -178,36 +178,51 @@ export const getFileNameFromPath = (path: string) => {
  * 页面按钮鉴权
  * @param name
  */
-// export const auth = (name: string) => {
-//     const path = getCurrentRoutePath()
-//     const store = isAdminApp() ? useNavTabs() : useMemberCenter()
-//     if (store.state.authNode.has(path)) {
-//         if (store.state.authNode.get(path)!.some((v: string) => v == path + '/' + name)) {
-//             return true
-//         }
-//     }
-//     return false
-// }
+export const auth = (name: string) => {
+  // const path = getCurrentRoutePath()
+  // const store = isAdminApp() ? useNavTabs() : useMemberCenter()
+  // if (store.state.authNode.has(path)) {
+  //     if (store.state.authNode.get(path)!.some((v: string) => v == path + '/' + name)) {
+  //         return true
+  //     }
+  // }
+  return true
+}
 
 /**
  * 获取资源完整地址
  * @param relativeUrl 资源相对地址
  * @param domain 指定域名
  */
-// export const fullUrl = (relativeUrl: string, domain = '') => {
-//     const siteConfig = useSiteConfig()
-//     if (!domain) {
-//         domain = siteConfig.cdnUrl ? siteConfig.cdnUrl : getUrl()
-//     }
-//     if (!relativeUrl) return domain
+export const fullUrl = (relativeUrl: string, domain = '') => {
+  const siteConfig = useSiteConfig()
+  if (!domain) {
+    domain = siteConfig.cdnUrl ? siteConfig.cdnUrl : getUrl()
+  }
+  if (!relativeUrl) return domain
 
-//     const regUrl = new RegExp(/^http(s)?:\/\//)
-//     const regexImg = new RegExp(/^((?:[a-z]+:)?\/\/|data:image\/)(.*)/i)
-//     if (!domain || regUrl.test(relativeUrl) || regexImg.test(relativeUrl)) {
-//         return relativeUrl
-//     }
-//     return domain + relativeUrl
-// }
+  const regUrl = new RegExp(/^http(s)?:\/\//)
+  const regexImg = new RegExp(/^((?:[a-z]+:)?\/\/|data:image\/)(.*)/i)
+  if (!domain || regUrl.test(relativeUrl) || regexImg.test(relativeUrl)) {
+    return relativeUrl
+  }
+  return domain + relativeUrl
+}
+
+/**
+ * 获取一组资源的完整地址
+ * @param relativeUrls 资源相对地址
+ * @param domain 指定域名
+ */
+export const arrayFullUrl = (relativeUrls: string | string[], domain = '') => {
+  if (typeof relativeUrls === 'string') {
+    relativeUrls = relativeUrls == '' ? [] : relativeUrls.split(',')
+  }
+  for (const key in relativeUrls) {
+    relativeUrls[key] = fullUrl(relativeUrls[key], domain)
+  }
+  return relativeUrls
+}
 
 /**
  * 获取路由 path
@@ -264,21 +279,6 @@ export const getFileNameFromPath = (path: string) => {
 // }
 
 /**
- * 获取一组资源的完整地址
- * @param relativeUrls 资源相对地址
- * @param domain 指定域名
- */
-// export const arrayFullUrl = (relativeUrls: string | string[], domain = '') => {
-//     if (typeof relativeUrls === 'string') {
-//         relativeUrls = relativeUrls == '' ? [] : relativeUrls.split(',')
-//     }
-//     for (const key in relativeUrls) {
-//         relativeUrls[key] = fullUrl(relativeUrls[key], domain)
-//     }
-//     return relativeUrls
-// }
-
-/**
  * 格式化时间戳
  * @param dateTime 时间戳
  * @param fmt 格式化方式，默认：yyyy-mm-dd hh:MM:ss
@@ -322,7 +322,7 @@ const padStart = (str: string, maxLength: number, fillString = ' ') => {
     if (times === 1) {
       fillString += fillString
     }
-  } 
+  }
   return fillString.slice(0, fillLength) + str
 }
 
@@ -358,13 +358,13 @@ export const getGreet = () => {
  * @param childrenKey
  * @param parentKey
  */
-export function listToTree<T>(
-    list: anyObj[], 
-    key: string = 'id', 
-    parentKey: string = 'parentId' ) {
-  let map: anyObj = {}, node, roots = [], i
+export function listToTree<T>(list: anyObj[], key: string = 'id', parentKey: string = 'parentId') {
+  let map: anyObj = {},
+    node,
+    roots = [],
+    i
 
-  for(i = 0; i < list.length; i += 1) {
+  for (i = 0; i < list.length; i += 1) {
     map[list[i][key]] = i
     list[i].children = []
   }
@@ -378,4 +378,12 @@ export function listToTree<T>(
     }
   }
   return roots as T[]
+}
+
+/**
+ * 根据运行环境获取基础请求URL
+ */
+export const getUrl = (): string => {
+  const value: string = import.meta.env.VITE_AXIOS_BASE_URL as string
+  return value == 'getCurrentDomain' ? window.location.protocol + '//' + window.location.host : value
 }

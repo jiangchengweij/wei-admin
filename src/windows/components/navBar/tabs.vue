@@ -5,7 +5,7 @@
       @click="onTab(item)"
       class="ba-nav-tab"
       :class="navTabs.state.activeMenu?.menu_id === item.menu_id ? 'active': ''"
-      :key="item.menu_id"
+      :key="idx"
       :ref="tabsRefs.set"
       @contextmenu.prevent="onContextmenu(item, $event)"
     >
@@ -96,12 +96,9 @@ function closeTab(menu: AdminMenu) {
   if (navTabs.state.activeMenu?.menu_id === menu.menu_id) {
     toLastTab()
   } else {
-    setTimeout(() => {
+    nextTick(() => {
       selectNavTab()
-    }, 1000)
-    // nextTick(() => {
-    //   selectNavTab()
-    // })
+    })
   }
 }
 
@@ -146,9 +143,6 @@ function selectNavTab() {
   const index = navTabs.state.tabsView.findIndex((item) => item.menu_id === navTabs.state.activeMenu?.menu_id)
   if(index < 0) return false
   const dom = tabsRefs.value[index] as HTMLDivElement
-  console.log(index)
-  console.log(tabsRefs.value)
-  console.log(tabsRefs.value[index])
   if(!dom) return false
   activeBoxStyle.width = dom.clientWidth + 'px'
   activeBoxStyle.transform = `translateX(${dom.offsetLeft}px)`
@@ -206,7 +200,7 @@ onMounted(() => {
     justify-content: center;
     white-space: nowrap;
     cursor: pointer;
-    height: calc(var(--nav-tab-height) - 10px);
+    height: calc(var(--nav-tab-height) - 12px);
     user-select: 0;
     z-index: 1;
     opacity: 0.7;
@@ -231,10 +225,10 @@ onMounted(() => {
   }
   .nav-tabs-active-box {
     position: absolute;
-    height: calc(var(--nav-tab-height) - 10px);
+    height: calc(var(--nav-tab-height) - 12px);
     border-radius: var(--el-border-radius-base);
     background-color: v-bind('config.getColorVal("headerBarTabActiveBackground")');
-    box-shadow: var(--el-box-shadow-light);
+    box-shadow: var(--el-box-shadow-lighter);
     transition: all 0.2s;
     -webkit-transition: all 0.2s;
   }
