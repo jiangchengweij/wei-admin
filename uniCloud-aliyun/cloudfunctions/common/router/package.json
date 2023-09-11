@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "uni-id-common": "file:../../../../src/uni_modules/uni-id-common/uniCloud/cloudfunctions/common/uni-id-common"
+    "uni-id-common": "file:../../../../src/uni_modules/uni-id-common/uniCloud/cloudfunctions/common/uni-id-common",
+    "utils": "file:../utils"
   }
 }

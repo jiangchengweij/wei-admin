@@ -22,7 +22,8 @@ class UserService extends BaseService {
 					dcloud_appid: '$dcloud_appid'
 				},
 				pipeline: $.pipeline()
-					.match(dbCmd.expr($.all(['$$dcloud_appid', ['$appid']])))
+					.match(dbCmd.expr(
+						$.in(['$appid', $.ifNull(['$$dcloud_appid', []])])))
 					.project({
 						name: 1,
 					})

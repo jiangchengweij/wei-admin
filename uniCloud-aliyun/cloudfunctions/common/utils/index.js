@@ -1,4 +1,11 @@
-module.exports = function(e) {
-	// 公用模块用法请参考 https://uniapp.dcloud.io/uniCloud/cf-common
-	return e
+const _ = require('./lib/lodash')
+const AsyncValidator = require('async-validator')
+const commont = require('./lib/common')
+const tree = require('./lib/tree')
+
+module.exports = {
+	_,
+	Schema: AsyncValidator.default,
+	cm: commont,
+	tree
 }

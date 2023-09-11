@@ -15,7 +15,7 @@ onLoad(() => {
 })
 
 function onTestActionRouter() {
-  $cloud.adminRouter('hello/index', { msg: 'nihao' })
+  $cloud.adminRouter('menu/index', { msg: 'nihao' })
 }
 
 function onTestActionInitRouter() {

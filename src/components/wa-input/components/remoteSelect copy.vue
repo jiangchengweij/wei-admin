@@ -33,7 +33,7 @@
           <el-option
             class="remote-select-option"
             v-for="item in state.options"
-            :label="item[field]"
+            :label="item[labelField]"
             :value="item[state.primaryKey].toString()"
             :key="item[state.primaryKey]"
           >
@@ -46,7 +46,7 @@
           </el-option>
           <el-pagination
             v-if="state.total"
-            :currentPage="state.currentPage"
+            :currentPage="state.pageCurrent"
             :page-size="state.pageSize"
             class="select-pagination"
             layout="->, prev, next"
@@ -61,39 +61,59 @@
 
 <script setup lang="ts">
 import { reactive, watch, onMounted, onUnmounted, ref, nextTick, getCurrentInstance, toRaw } from 'vue'
+// import { getSelectData } from '/@/api/common'
 import { uuid } from '/@/utils/random'
 import type { ElSelect } from 'element-plus'
 import { isEmpty } from 'lodash-es'
 import { getArrayKey } from '/@/utils/common'
-import { useCloud } from '@/cloud' 
+import { useDatacom, datacomProps } from '@/cloud/mixinDataCom'
+import type { DatacomProps } from '@/cloud/mixinDataCom'
 
 const selectRef = ref<InstanceType<typeof ElSelect> | undefined>()
 type ElSelectProps = Partial<InstanceType<typeof ElSelect>['$props']>
 type valType = string | number | string[] | number[]
 
-interface Props extends /* @vue-ignore */ ElSelectProps {
+interface Props extends ElSelectProps, DatacomProps {
   pk?: string
-  field?: string
-  params?: anyObj
+  labelField?: string
+  valueField?: string
   multiple?: boolean
-  actionUrl: string
   modelValue: valType
   labelFormatter?: (optionData: anyObj, optionKey: string) => string
-  tooltipParams?: anyObj
+  tooltipParams?: anyObj,
+  keywordKey?: string,
+  collection?: string,
+  action?: string,
+  field?: string,
+  orderby?: string,
+  where?: string,
+  pageData?: string,
+  pageCurrent?: number,
+  pageSize?: number,
+  getcount?: boolean | string,
+  gettree?: boolean | string,
+  gettreepath?: boolean | string,
+  startwidth?: string
+  limitlevel?: string
+  groupby?: string,
+  groupField?: string,
+  startwith?: string
+  distinct?: string | boolean,
+  manual?: boolean
 }
+
 const props = withDefaults(defineProps<Props>(), {
   pk: '_id',
-  field: 'name',
-  params: () => {
-    return {}
-  },
-  actionUrl: '',
   modelValue: '',
   multiple: false,
   tooltipParams: () => {
     return {}
   },
+  ...datacomProps,
+  labelField: 'name',
 })
+
+const { mixinDatacomEasyGet, mixinDatacomGet } = useDatacom({ props })
 
 const state: {
   // 主表字段名(不带表别名)
@@ -101,34 +121,33 @@ const state: {
   options: anyObj[]
   loading: boolean
   total: number
-  currentPage: number
+  pageCurrent: number
   pageSize: number
-  params: anyObj
   keyword: string
   value: valType
   selectKey: string
   initializeData: boolean
   accidentBlur: boolean
   focusStatus: boolean
+  where: string
 } = reactive({
   primaryKey: props.pk,
   options: [],
   loading: false,
   total: 0,
-  currentPage: 1,
+  pageCurrent: 1,
   pageSize: 10,
-  params: props.params,
   keyword: '',
   value: props.modelValue ? props.modelValue : '',
   selectKey: uuid(),
   initializeData: false,
   accidentBlur: false,
   focusStatus: false,
+  where: ''
 })
 
 let io: null | IntersectionObserver = null
 const instance = getCurrentInstance()
-const cloud = useCloud()
 
 const emits = defineEmits<{
   (e: 'update:modelValue', value: valType): void
@@ -163,12 +182,13 @@ const onVisibleChange = (val: boolean) => {
 
 const onFocus = () => {
   state.focusStatus = true
-  if (selectRef.value?.query != state.keyword) {
-    state.keyword = ''
-    state.initializeData = false
-    // el-select 自动清理搜索词会产生意外的脱焦
-    state.accidentBlur = true
-  }
+  //TOOD 并未发现脱焦问题
+  // if (selectRef.value?.query != state.keyword) {
+  //   state.keyword = ''
+  //   state.initializeData = false
+  //   // el-select 自动清理搜索词会产生意外的脱焦
+  //   state.accidentBlur = false
+  // }
   if (!state.initializeData) {
     getData()
   }
@@ -186,26 +206,58 @@ const onClear = () => {
 const onLogKeyword = (q: string) => {
   //修复bug,关闭时候也存在接口调用
   if(state.keyword === q) return
+  console.log(q)
   state.keyword = q
   getData()
 }
 
 const getData = (initValue: valType = '') => {
   state.loading = true
-  state.params.page = state.currentPage
-  state.params.initKey = props.pk
-  state.params.initValue = initValue
-  cloud.adminRouter(props.actionUrl, { quickSearch: state.keyword, select: true, ...state.params })
-    .then((res) => {
+  if(state.keyword && state.keyword != '') {
+    if (props.keywordKey && props.keywordKey != '') {
+      const keywordWhere = `/${state.keyword}/.test(${props.keywordKey})`
+      state.where = props.where && props.where != '' ? `${props.where} && ${keywordWhere}` : keywordWhere
+    }
+  } else {
+    state.where = props.where
+  }
+  console.log(props)
+  mixinDatacomGet(state).then((res) => {
+    if(!res.errCode) {
       let initializeData = true
-      let opts = res.data.options ? res.data.options : res.data.list
+      const { data, total } = res
+      let opts:anyObj[] = []
+      if (props.gettree) {
+        const setChildren = (parents: anyObj[], index: number = 0) => {
+          let prefix = ''
+          if(index > 0) {
+            prefix = Array.from({length: index}).fill('  ').join('')
+          }
+          parents.forEach((item, ind) => {
+            let tmpLabel = item[props.labelField]
+            if (index > 0) {
+              tmpLabel = prefix + (ind === parents.length - 1 ? '└' : '├') + item[props.labelField]
+            }
+            opts.push({
+              ...item,
+              [props.labelField]: tmpLabel
+            })
+            if(item.children && item.children.length > 0) {
+              setChildren(item.children, index + 1)
+            }
+          })
+        }
+        setChildren(data, 0)
+      } else {
+        opts = data as anyObj[]
+      }
       if (typeof props.labelFormatter == 'function') {
         for (const key in opts) {
-          opts[key][props.field] = props.labelFormatter(opts[key], key)
+          opts[key][props.labelField] = props.labelFormatter(opts[key], key)
         }
       }
       state.options = opts
-      state.total = res.data.total ?? 0
+      state.total = total ? total : data.length
       if (initValue) {
         // 重新渲染组件,确保在赋值前,opts已加载到-兼容 modelValue 更新
         state.selectKey = uuid()
@@ -220,14 +272,15 @@ const getData = (initValue: valType = '') => {
           state.accidentBlur = false
         })
       }
-    })
-    .catch(() => {
-      state.loading = false
-    })
+    }
+  }).catch(() => {
+    state.loading = false
+  })
 }
 
 const onSelectCurrentPageChange = (val: number) => {
-  state.currentPage = val
+  state.pageCurrent = val
+  console.log('onSelectCurrentPageChange')
   getData()
 }
 
@@ -241,11 +294,13 @@ const initDefaultValue = () => {
     } else if (typeof state.value === 'number') {
       state.value = state.value.toString()
     }
+    console.log('initDefaultValue')
     getData(state.value)
   }
 }
 
 onMounted(() => {
+  console.log("onMounted")
   if (props.pk.indexOf('.') > 0) {
     let pk = props.pk.split('.')
     state.primaryKey = pk[1] ? pk[1] : pk[0]

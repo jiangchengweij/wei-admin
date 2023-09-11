@@ -8,14 +8,14 @@ async function CallFun(this:{ fun: Function }, data: unknown) {
   try {
     const res = await this.fun(data)
     let resData = res.result ? res.result : res
-    if (!resData.errCode || resData.errCode === 0) {
+    if (!resData.code || resData.code === 0) {
       return resData
     }
     error = res
   } catch(e) {
     error = e
   }
-  errroHandle(error as UniCloud.UniError)
+  errroHandle(error)
   throw error
 }
 
@@ -69,9 +69,9 @@ function kebabCase(word: string) {
   return word.replace(/[A-Z]/g, (k) => '-' + k).toLowerCase()
 }
 
-function errroHandle(e: UniCloud.UniError) {
+function errroHandle(e: anyObj) {
   ElNotification({
-    message: e.errMsg || '未知错误',
+    message: e.message || '未知错误',
     type: 'error'
   })
 }

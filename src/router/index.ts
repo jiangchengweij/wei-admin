@@ -83,11 +83,17 @@ function initRouter(app: App) {
           // }
           let prefix = ''
 
-          prefix = './backend/' + config.lang.defaultLang
+          prefix = './admin/' + config.lang.defaultLang
           
           // 去除 path 中的 /pages
-          const adminPath = to.path.slice(to.path.indexOf('/pages') + '/pages'.length)
-          if (adminPath) loadPath.push(prefix + adminPath + '.ts')
+          let adminPath = to.path.slice(to.path.indexOf('/pages') + '/pages'.length)
+          if (adminPath) {
+            //去除后缀index
+            if(/(\/index)$/.test(adminPath)) {
+              adminPath = adminPath.slice(0, adminPath.indexOf('/index'))
+            }
+            loadPath.push(prefix + adminPath + '.ts')
+          }
 
           if (!window.loadLangHandle.publicMessageLoaded) window.loadLangHandle.publicMessageLoaded = []
           const publicMessagePath = prefix + '.ts'
@@ -95,11 +101,13 @@ function initRouter(app: App) {
             loadPath.push(publicMessagePath)
             window.loadLangHandle.publicMessageLoaded.push(publicMessagePath)
           }
+          
           // 去重
           loadPath = uniq(loadPath)
 
           for (const key in loadPath) {
             loadPath[key] = loadPath[key].replaceAll('${lang}', config.lang.defaultLang)
+            
             if (loadPath[key] in window.loadLangHandle) {
               window.loadLangHandle[loadPath[key]]().then((res: { default: anyObj }) => {
                 const pathName = loadPath[key].slice(loadPath[key].lastIndexOf(prefix) + (prefix.length + 1), loadPath[key].lastIndexOf('.'))

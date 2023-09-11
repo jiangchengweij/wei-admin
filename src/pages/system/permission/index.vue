@@ -28,13 +28,7 @@ const tableRef = ref()
 
 // 直接实例化 baTableClass 并传递各种参数
 const waTableIns = new waTableClass(
-  new waTableRouter({
-    collection: 'uni-id-permissions',
-    quickSearchField: 'permission_id',
-    field: 'permission_name, permission_id, parent_id, comment, create_date',
-    orderby: 'permission_id asc',
-    pk: '_id',
-  }), // 一个api类的实例，自动生成index、edit、del、等url和请求方法，提供控制器url即可
+  new waTableRouter('permission'),// 一个api类的实例，自动生成index、edit、del、等url和请求方法，提供控制器url即可
   // 表格数据
   {
     // 表格列

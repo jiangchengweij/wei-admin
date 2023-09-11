@@ -126,7 +126,7 @@ export default class waTable {
     this.form.loading = true
     this.form.items = {}
     return this.router
-      .edit({
+      .detail({
         [this.table.pk!]: id,
       })
       .then((res: anyObj) => {

@@ -8,5 +8,8 @@
 	},
 	"keywords": [],
 	"author": "",
-	"license": "ISC"
+	"license": "ISC",
+	"dependencies": {
+		"async-validator": "^4.2.5"
+	}
 }
